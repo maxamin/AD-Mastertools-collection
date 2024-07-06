@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <RootNamespace>ConstantsInlining.Lib</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+    Optimize the assembly in all cases, to allow the unit test case to work. 
+    Allows the JIT compiler to inline code. This is required for the unit test.  
+  -->
+  <PropertyGroup Label="Optimize Build always">
+    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+</Project>

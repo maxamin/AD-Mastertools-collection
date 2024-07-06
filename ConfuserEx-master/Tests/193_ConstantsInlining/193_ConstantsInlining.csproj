@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net461</TargetFramework>
+    <RootNamespace>ConstantsInlining</RootNamespace>
+  </PropertyGroup>
+
+  <!--
+    Optimize the assembly in all cases, to allow the unit test case to work. 
+    Allows the JIT compiler to inline code. This is required for the unit test.  
+  -->
+  <PropertyGroup Label="Optimize Build always">
+    <Optimize>true</Optimize>
+    <DebugType>full</DebugType>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\193_ConstantsInlining.Lib\193_ConstantsInlining.Lib.csproj" />
+  </ItemGroup>
+
+</Project>

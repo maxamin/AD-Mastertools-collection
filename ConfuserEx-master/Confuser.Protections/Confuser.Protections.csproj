@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <Import Project="..\ConfuserEx.Common.props" Condition="Exists('..\ConfuserEx.Common.props')" />
+
+  <PropertyGroup Label="Assembly Settings">
+    <TargetFrameworks>net461;netstandard2.0</TargetFrameworks>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\ConfuserEx.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Assembly Information">
+    <Title>ConfuserEx Protections</Title>
+    <Description>Protections and packers of ConfuserEx</Description>
+  </PropertyGroup>
+
+  <ItemGroup Label="Nuget Dependencies">
+    <PackageReference Include="System.ValueTuple" Version="4.5.0" />
+  </ItemGroup>
+
+  <ItemGroup Label="Project Dependencies">
+    <ProjectReference Include="..\Confuser.DynCipher\Confuser.DynCipher.csproj" />
+    <ProjectReference Include="..\Confuser.Renamer\Confuser.Renamer.csproj" />
+    <ProjectReference Include="..\Confuser.Runtime\Confuser.Runtime.csproj" Condition="'$(TargetFramework)' == 'net461'" />
+  </ItemGroup>
+
+  <Import Project="..\ConfuserEx.Common.targets" Condition="Exists('..\ConfuserEx.Common.targets')" />
+
+</Project>

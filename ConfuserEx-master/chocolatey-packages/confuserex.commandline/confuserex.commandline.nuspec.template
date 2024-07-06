@@ -1,0 +1,60 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2015/06/nuspec.xsd">
+  <metadata>
+    <id>confuserex.commandline</id>
+    <version>{{PACKAGEVERSION}}</version>
+    <owners>mkaring</owners>
+    <title>ConfuserEx (CLI)</title>
+    <authors>Martin Karing</authors>
+    <projectUrl>https://mkaring.github.io/ConfuserEx/</projectUrl>
+    <iconUrl>https://mkaring.github.io/ConfuserEx/assets/ConfuserEx.png</iconUrl>
+    <licenseUrl>https://github.com/mkaring/ConfuserEx/blob/v{{PACKAGEVERSION}}/LICENSE.md</licenseUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectSourceUrl>https://github.com/mkaring/ConfuserEx/tree/v{{PACKAGEVERSION}}</projectSourceUrl>
+    <docsUrl>https://github.com/mkaring/ConfuserEx/wiki</docsUrl>
+    <bugTrackerUrl>https://github.com/mkaring/ConfuserEx/issues</bugTrackerUrl>
+    <tags>confuserex cil confuser dnlib dotnet il msil net .net obfuscator packer protector</tags>
+    <summary>ConfuserEx is a open-source protector for .NET applications.</summary>
+    <description><![CDATA[ConfuserEx is a open-source protector for .NET applications.
+It is the successor of [Confuser](http://confuser.codeplex.com) project.
+
+# Features
+
+* Supports .NET Framework 2.0/3.0/3.5/4.0/4.5/4.6/4.7
+* Symbol renaming (Support WPF/BAML)
+* Protection against debuggers/profilers
+* Protection against memory dumping
+* Protection against tampering (method encryption)
+* Control flow obfuscation
+* Constant/resources encryption
+* Reference hiding proxies
+* Disable decompilers
+* Embedding dependency
+* Compressing output
+* Extensible plugin API
+* Many more are coming!
+
+# Commandline package
+
+This package of ConfuserEx only contains the command line tools.
+If you require the user interface as well, please use the [ConfuserEx](https://chocolatey.org/packages/confuserex) package.
+
+# Usage
+
+```Batchfile
+Confuser.CLI.exe <path to project file>
+```
+
+The project file is a ConfuserEx Project (*.crproj).
+The format of project file can be found in [docs\ProjectFormat.md](https://github.com/mkaring/ConfuserEx/blob/v{{PACKAGEVERSION}}/docs/ProjectFormat.md)]]></description>
+    <releaseNotes>[View on GitHub](https://github.com/mkaring/ConfuserEx/releases/tag/v{{PACKAGEVERSION}})</releaseNotes>
+    <dependencies>
+      <dependency id="dotnetfx" version="4.6.1.0" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="tools\**" target="tools" />
+    <file src="legal\LICENSE.md" target="legal" />
+    <file src="legal\VERIFICATION.txt" target="legal" />
+  </files>
+</package>

@@ -1,0 +1,206 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+
+  <Import Project="$(MSBuildThisFileDirectory)\Confuser.MSBuild.Tasks.targets" />
+  
+  <PropertyGroup>
+    <ConfuserKeyFile Condition="'$(ConfuserKeyFile)' == ''">$(AssemblyOriginatorKeyFile)</ConfuserKeyFile>
+    <ConfuserIntermediateOutputPath Condition="'$(ConfuserIntermediateOutputPath)' == ''">$(IntermediateOutputPath)confused\</ConfuserIntermediateOutputPath>
+    <ConfuserReplaceOutput Condition="'$(ConfuserReplaceOutput)' == ''">false</ConfuserReplaceOutput>
+    <ConfuserOutDir Condition="'$(ConfuserOutDir)' == ''">$(OutDir)confused\</ConfuserOutDir>
+    <ConfuserSymbolFileName Condition="'$(ConfuserSymbolFileName)' == '' And '$(ConfuserReplaceOutput)' == 'true'">$(AssemblyName).symbols.map</ConfuserSymbolFileName>
+    <ConfuserSymbolFileName Condition="'$(ConfuserSymbolFileName)' == ''">symbols.map</ConfuserSymbolFileName>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(ConfuserProject)' == ''">
+    <ConfuserProject Condition="Exists('$(MSBuildProjectDirectory)\$(MSBuildProjectName).crproj')">$(MSBuildProjectDirectory)\$(MSBuildProjectName).crproj</ConfuserProject>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ConfuserExDependsOn>
+      CreateConfuserProject;
+      ConfuseAssembly;
+      _ReplaceOutputWithConfusedAssemblies;
+      _ReplaceDebugOutputWithConfusedAssemblies;
+      CopyConfusedFilesToOutputDirectory;      
+      _CopySymbolMapToOutputDirectory;
+    </ConfuserExDependsOn>
+  </PropertyGroup>
+
+  <Target Name="ConfuserEx"
+          DependsOnTargets="$(ConfuserExDependsOn)"
+          BeforeTargets="CopyFilesToOutputDirectory" />
+
+  <PropertyGroup>
+    <CreateConfuserProjectDependsOn>
+      ResolveReferences;
+      ComputeIntermediateSatelliteAssemblies
+    </CreateConfuserProjectDependsOn>
+  </PropertyGroup>
+
+  <Target Name="CreateConfuserProject"
+          Condition="$(DesignTimeBuild) != true And $(Obfuscate) == true"          
+          DependsOnTargets="$(CreateConfuserProjectDependsOn)"
+          Inputs="@(IntermediateAssembly->'%(FullPath)');$(ConfuserProject);@(IntermediateSatelliteAssembliesWithTargetPath)"
+          Outputs="@(IntermediateAssembly->'$(IntermediateOutputPath)%(Filename).crproj')">
+    <Confuser.MSBuild.Tasks.CreateProjectTask
+      SourceProject="$(ConfuserProject)"
+      References="@(ReferencePath)"
+      AssemblyPath="@(IntermediateAssembly)"
+      SatelliteAssemblyPaths="@(IntermediateSatelliteAssembliesWithTargetPath)"
+      KeyFilePath="$(ConfuserKeyFile)"
+      ResultProject="@(IntermediateAssembly->'$(IntermediateOutputPath)%(Filename).crproj')"/>
+  </Target>
+
+  <PropertyGroup>
+    <ConfuseAssemblyDependsOn>
+      CreateConfuserProject
+    </ConfuseAssemblyDependsOn>
+  </PropertyGroup>
+
+  <Target Name="ConfuseAssembly"
+          Condition="Exists('@(IntermediateAssembly)') And $(DesignTimeBuild) != true And $(Obfuscate) == true"
+          DependsOnTargets="$(ConfuseAssemblyDependsOn)"
+          Inputs="@(IntermediateAssembly->'%(FullPath)');@(IntermediateAssembly->'$(IntermediateOutputPath)%(Filename).crproj')"
+          Outputs="@(IntermediateAssembly->'$(ConfuserIntermediateOutputPath)%(Filename)%(Extension)');@(IntermediateSatelliteAssembliesWithTargetPath->'$(ConfuserIntermediateOutputPath)%(TargetPath)')">
+    <Confuser.MSBuild.Tasks.ConfuseTask
+      Project="@(IntermediateAssembly->'$(IntermediateOutputPath)%(Filename).crproj')"
+      OutputAssembly="@(IntermediateAssembly->'$(ConfuserIntermediateOutputPath)%(Filename)%(Extension)')">
+      <Output TaskParameter="ConfusedFiles" ItemName="FileWrites"/>
+    </Confuser.MSBuild.Tasks.ConfuseTask>
+  </Target>
+
+  <Target Name="_ReplaceOutputWithConfusedAssemblies"
+          Condition="$(DesignTimeBuild) != true And $(Obfuscate) == true and '$(ConfuserReplaceOutput)' == 'true'"
+          DependsOnTargets="ConfuseAssembly">
+    <CreateItem Include="@(IntermediateAssembly->'$(ConfuserIntermediateOutputPath)%(Filename)%(Extension)')">
+      <Output TaskParameter="Include" ItemName="IntermediateConfusedAssembly" />
+    </CreateItem>
+    <ItemGroup>
+      <IntermediateAssembly Remove="@(IntermediateAssembly)" />
+    </ItemGroup>
+    <CreateItem Include="@(IntermediateConfusedAssembly)">
+      <Output TaskParameter="Include" ItemName="IntermediateAssembly" />
+    </CreateItem>
+  </Target>
+  
+  <Target Name="_ReplaceDebugOutputWithConfusedAssemblies"
+          Condition="$(DesignTimeBuild) != true And $(Obfuscate) == true and '$(ConfuserReplaceOutput)' == 'true' and '@(_DebugSymbolsIntermediatePath)' != ''"
+          DependsOnTargets="ConfuseAssembly">
+    <CreateItem Include="@(IntermediateAssembly->'$(ConfuserIntermediateOutputPath)%(Filename).pdb')">
+      <Output TaskParameter="Include" ItemName="_ConfusedDebugSymbolsIntermediatePath" />
+    </CreateItem>
+    <ItemGroup>
+      <_DebugSymbolsIntermediatePath Remove="@(_DebugSymbolsIntermediatePath)" />
+    </ItemGroup>
+    <CreateItem Include="@(_ConfusedDebugSymbolsIntermediatePath)">
+      <Output TaskParameter="Include" ItemName="_DebugSymbolsIntermediatePath" />
+    </CreateItem>
+  </Target>
+  
+  <Target Name="_CopySymbolMapToOutputDirectory"
+          Condition="$(DesignTimeBuild) != true And $(Obfuscate) == true"
+          DependsOnTargets="ConfuseAssembly">
+    <PropertyGroup>
+      <_SymbolsMapOutputDirectory Condition="'$(ConfuserReplaceOutput)' == 'true'">$(OutDir)</_SymbolsMapOutputDirectory>
+      <_SymbolsMapOutputDirectory Condition="'$(ConfuserReplaceOutput)' != 'true'">$(ConfuserOutDir)</_SymbolsMapOutputDirectory>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <!-- By default we're not using Hard Links to copy to the output directory, and never when building in VS -->
+      <CreateHardLinksForCopyFilesToOutputDirectoryIfPossible Condition="'$(BuildingInsideVisualStudio)' == 'true' or '$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)' == ''">false</CreateHardLinksForCopyFilesToOutputDirectoryIfPossible>
+      <CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible Condition="'$(BuildingInsideVisualStudio)' == 'true' or '$(CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible)' == ''">false</CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <CopyConfuserSymbolsMapToOutputDirectory Condition="'$(CopyConfuserSymbolsMapToOutputDirectory)'==''">true</CopyConfuserSymbolsMapToOutputDirectory>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <_SymbolsMapSourceFiles Include="$(ConfuserIntermediateOutputPath)symbols.map" />
+      <_SymbolsMapDestinationFiles Include="$(_SymbolsMapOutputDirectory)$(ConfuserSymbolFileName)" />
+    </ItemGroup>
+
+    <!-- Copy the symbols.map file in case it exists. -->
+    <Copy
+      SourceFiles="@(_SymbolsMapSourceFiles)"
+      DestinationFiles="@(_SymbolsMapDestinationFiles)"
+      SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+      OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+      Retries="$(CopyRetryCount)"
+      RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+      UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+      UseSymboliclinksIfPossible="$(CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible)"
+      Condition="'$(CopyConfuserSymbolsMapToOutputDirectory)' == 'true' and '$(SkipCopyBuildProduct)' != 'true'">
+      
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
+      
+    </Copy>
+  </Target>
+
+  <Target Name="CopyConfusedFilesToOutputDirectory"
+          Condition="$(DesignTimeBuild) != true And $(Obfuscate) == true and '$(ConfuserReplaceOutput)' != 'true'">
+    <PropertyGroup>
+      <!-- By default we're not using Hard Links to copy to the output directory, and never when building in VS -->
+      <CreateHardLinksForCopyFilesToOutputDirectoryIfPossible Condition="'$(BuildingInsideVisualStudio)' == 'true' or '$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)' == ''">false</CreateHardLinksForCopyFilesToOutputDirectoryIfPossible>
+      <CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible Condition="'$(BuildingInsideVisualStudio)' == 'true' or '$(CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible)' == ''">false</CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible>
+    </PropertyGroup>
+
+    <PropertyGroup>
+      <CopyBuildOutputToOutputDirectory Condition="'$(CopyBuildOutputToOutputDirectory)'==''">true</CopyBuildOutputToOutputDirectory>
+      <CopyOutputSymbolsToOutputDirectory Condition="'$(CopyOutputSymbolsToOutputDirectory)'==''">true</CopyOutputSymbolsToOutputDirectory>
+    </PropertyGroup>
+
+    <!-- Copy the confused build product (.dll or .exe). -->
+    <Copy
+      SourceFiles="@(IntermediateAssembly->'$(ConfuserIntermediateOutputPath)%(Filename)%(Extension)')"
+      DestinationFolder="$(ConfuserOutDir)"
+      SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+      OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+      Retries="$(CopyRetryCount)"
+      RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+      UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+      UseSymboliclinksIfPossible="$(CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible)"
+      Condition="'$(CopyBuildOutputToOutputDirectory)' == 'true' and '$(SkipCopyBuildProduct)' != 'true'">
+      
+      <Output TaskParameter="DestinationFiles" ItemName="ConfusedMainAssembly"/>
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
+      
+    </Copy>
+    
+    <!-- Copy the debug information file (.pdb), if any -->
+    <Copy
+        SourceFiles="@(IntermediateAssembly->'$(ConfuserIntermediateOutputPath)%(Filename).pdb')"
+        DestinationFolder="$(ConfuserOutDir)"
+        SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+        OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+        Retries="$(CopyRetryCount)"
+        RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+        UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+        UseSymboliclinksIfPossible="$(CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible)"
+        Condition="'$(_DebugSymbolsProduced)'=='true' and '$(SkipCopyingSymbolsToOutputDirectory)' != 'true' and '$(CopyOutputSymbolsToOutputDirectory)'=='true'">
+        
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
+      
+    </Copy>
+
+    <!-- Copy the satellite assemblies (.resources.dll), if any -->
+    <Copy
+        SourceFiles="@(IntermediateSatelliteAssembliesWithTargetPath->'$(ConfuserIntermediateOutputPath)%(TargetPath)')"
+        DestinationFiles="@(IntermediateSatelliteAssembliesWithTargetPath->'$(ConfuserOutDir)%(TargetPath)')"
+        SkipUnchangedFiles="$(SkipCopyUnchangedFiles)"
+        OverwriteReadOnlyFiles="$(OverwriteReadOnlyFiles)"
+        Retries="$(CopyRetryCount)"
+        RetryDelayMilliseconds="$(CopyRetryDelayMilliseconds)"
+        UseHardlinksIfPossible="$(CreateHardLinksForCopyFilesToOutputDirectoryIfPossible)"
+        UseSymboliclinksIfPossible="$(CreateSymbolicLinksForCopyFilesToOutputDirectoryIfPossible)"
+        Condition="'$(_DebugSymbolsProduced)'=='true' and '$(SkipCopyingSymbolsToOutputDirectory)' != 'true' and '$(CopyOutputSymbolsToOutputDirectory)'=='true'">
+
+      <Output TaskParameter="DestinationFiles" ItemName="FileWrites"/>
+
+    </Copy>
+  </Target>
+</Project>

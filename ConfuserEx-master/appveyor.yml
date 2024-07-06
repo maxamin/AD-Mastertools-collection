@@ -1,0 +1,90 @@
+version: '{build}'
+image: Visual Studio 2019
+configuration: Release
+platform: Any CPU
+skip_commits:
+  files:
+  - doc/*
+  - readme.md
+  - license.md
+
+environment:
+  CHOCO_API_KEY:
+    secure: oSM1kJpS3CZN3XVnDWMEGfivr5hW3NR6KRsCjqAimtrv9zvbPObZLgsJ3ZthmkQs
+
+nuget:
+  disable_publish_on_pr: true
+
+install:
+- cmd: git submodule update --init --recursive
+
+before_build:
+- cmd: msbuild Confuser2.sln /t:Restore /logger:"C:\Program Files\AppVeyor\BuildAgent\Appveyor.MSBuildLogger.dll"
+
+build:
+  project: Confuser2.sln
+  verbosity: minimal
+
+after_build:
+- pwsh: >-
+    Push-Location Confuser.CLI\bin\$env:CONFIGURATION\net461;
+    . 7z a ..\..\..\..\ConfuserEx-CLI.zip "-xr!*.pdb" "-xr!*.xml";
+    Pop-Location
+- pwsh: >-
+    Push-Location ConfuserEx\bin\$env:CONFIGURATION\net461;
+    . 7z a ..\..\..\..\ConfuserEx-GUI.zip "-xr!*.pdb" "-xr!*.xml";
+    Pop-Location
+- pwsh: >-
+    Push-Location Confuser.CLI\bin\$env:CONFIGURATION\net461;
+    . 7z a ..\..\..\..\ConfuserEx.zip "-xr!*.pdb" "-xr!*.xml";
+    Pop-Location;
+    Push-Location ConfuserEx\bin\$env:CONFIGURATION\net461;
+    . 7z a ..\..\..\..\ConfuserEx.zip "-xr!*.pdb" "-xr!*.xml" -y;
+    Pop-Location
+
+artifacts:
+- path: ConfuserEx*.zip
+- path: Confuser.MSBuild.Tasks/bin/Release/*.nupkg
+  name: ConfuserEx.MSBuild
+
+for:
+-
+  branches:
+    except:
+      - master
+
+  build:
+    publish_nuget: false
+
+deploy:
+- provider: GitHub
+  tag: $(APPVEYOR_REPO_TAG_NAME)
+  description: "ConfuserEx $(APPVEYOR_REPO_TAG_NAME) Release"
+  auth_token:
+    secure: k2MIY7tKQEsg6+w3QIxMx6ptoBccUgOadKA1I8O9myFZS4SBdEINCbjGwALZrhdm
+  on:
+    APPVEYOR_REPO_TAG: true
+- provider: NuGet
+  api_key:
+    secure: yqARg8GA5EIFGPVpYPZeS3I5gjsByMvYLVfXylpC9mF33W4Z40tAmE9q0/yf2Xne
+  on:
+    APPVEYOR_REPO_TAG: true
+- provider: NuGet
+  server: https://nuget.pkg.github.com/mkaring/index.json
+  api_key:
+    secure: k2MIY7tKQEsg6+w3QIxMx6ptoBccUgOadKA1I8O9myFZS4SBdEINCbjGwALZrhdm
+  username:
+    secure: NGDRiYcrJaLN2PkRszWIVg==
+  on:
+    APPVEYOR_REPO_TAG: true
+after_deploy:
+- pwsh: >-
+    if ($env:APPVEYOR_REPO_TAG -eq $true) {
+        Copy-Item -Path ConfuserEx.zip -Destination .\chocolatey-packages\confuserex\tools
+        Copy-Item -Path ConfuserEx-CLI.zip -Destination .\chocolatey-packages\confuserex.commandline\tools
+        .\chocolatey-packages\New-ChocolateyPackage.ps1 -PackageVersion $env:APPVEYOR_REPO_TAG_NAME
+        choco apikey --key $env:CHOCO_API_KEY --source https://push.chocolatey.org/
+        Get-ChildItem -Path .\chocolatey-packages -Filter *.nupkg | ForEach-Object {
+            choco push $_.FullName --source https://push.chocolatey.org/
+        }
+    }

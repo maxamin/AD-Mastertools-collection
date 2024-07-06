@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+
+  <Import Project="..\ConfuserEx.Common.props" Condition="Exists('..\ConfuserEx.Common.props')" />
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net461</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <SignAssembly>true</SignAssembly>
+    <AssemblyOriginatorKeyFile>..\ConfuserEx.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Assembly Information">
+    <Title>ConfuserEx</Title>
+    <Description>Graphical Interface for the ConfuserEx open-source protector for .NET assemblies.</Description>
+    <ApplicationIcon>ConfuserEx.ico</ApplicationIcon>
+  </PropertyGroup>
+
+  <ItemGroup Label="Nuget Dependencies">
+    <PackageReference Include="MvvmLightLibs" Version="5.4.1.1" />
+    <PackageReference Include="Ookii.Dialogs.Wpf" Version="3.1.0" />
+  </ItemGroup>
+  
+  <ItemGroup Label="Project Dependencies">
+    <ProjectReference Include="..\Confuser.Core\Confuser.Core.csproj" />
+    <ProjectReference Include="..\Confuser.Protections\Confuser.Protections.csproj" />
+    <ProjectReference Include="..\Confuser.Renamer\Confuser.Renamer.csproj" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Resource Include="Resources\*.png" />
+    <Resource Include="ConfuserEx.ico" />
+    <Resource Include="Resources\FontAwesome.otf" />
+  </ItemGroup>
+
+  <Import Project="..\ConfuserEx.Common.targets" Condition="Exists('..\ConfuserEx.Common.targets')" />
+
+</Project>

@@ -1,0 +1,28 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003"> 
+
+  <PropertyGroup Label="C-Sharp Compiler Settings" Condition="'$(MSBuildProjectExtension)' == '.csproj'">
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
+  <PropertyGroup Label="Assembly Information">
+    <Authors>Ki;Martin Karing</Authors>
+    <Copyright>Copyright © 2014 Ki, 2018 Martin Karing</Copyright>
+    <RepositoryUrl>https://github.com/mkaring/ConfuserEx.git</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+  </PropertyGroup>
+  
+  <PropertyGroup Label="Language">
+    <NeutralLanguage>en</NeutralLanguage>
+  </PropertyGroup>
+  
+  <PropertyGroup Label="SourceLink">
+	<SourceLinkServerType>GitHub</SourceLinkServerType>
+	<SourceLinkOriginUrl>$(RepositoryUrl)</SourceLinkOriginUrl>
+  </PropertyGroup> 
+  
+  <PropertyGroup Label="Code Analysis">
+	<EnableCodeAnalysis>false</EnableCodeAnalysis>
+  </PropertyGroup>
+  
+</Project>

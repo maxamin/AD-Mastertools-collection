@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<root>
+  <Node DisplayValuePath="TestProperty">
+	<ChildNode>Test1</ChildNode>
+	<ChildNode>Test2</ChildNode>
+  </Node>
+  <Node>Node2</Node>
+</root>

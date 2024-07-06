@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net461</TargetFramework>
+    <RootNamespace>SignatureMismatch</RootNamespace>
+    <LangVersion>7.3</LangVersion>
+  </PropertyGroup>
+
+</Project>

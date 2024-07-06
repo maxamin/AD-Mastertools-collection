@@ -1,0 +1,7 @@
+
+2022-12-26 01:47:10 Apache Commons Daemon procrun stderr initialized.
+WARNING: An illegal reflective access operation has occurred
+WARNING: Illegal reflective access using Lookup on org.neo4j.internal.unsafe.UnsafeUtil (file:/C:/AD/Tools/neo4j-community-4.4.5-windows/neo4j-community-4.4.5/lib/neo4j-unsafe-4.4.5.jar) to class java.nio.Buffer
+WARNING: Please consider reporting this to the maintainers of org.neo4j.internal.unsafe.UnsafeUtil
+WARNING: Use --illegal-access=warn to enable warnings of further illegal reflective access operations
+WARNING: All illegal access operations will be denied in a future release

@@ -1,0 +1,13 @@
+
+2022-12-26 01:47:10 Apache Commons Daemon procrun stdout initialized.
+2022-12-26 09:47:17.077+0000 INFO  Starting...
+2022-12-26 09:47:21.358+0000 INFO  This instance is ServerId{cc5ff0de} (cc5ff0de-f6d3-472a-9b11-ec50a8b695b0)
+2022-12-26 09:47:24.983+0000 INFO  ======== Neo4j 4.4.5 ========
+2022-12-26 09:47:27.296+0000 INFO  Performing postInitialization step for component 'security-users' with version 3 and status CURRENT
+2022-12-26 09:47:27.296+0000 INFO  Updating the initial password in component 'security-users'
+2022-12-26 09:47:27.718+0000 INFO  Bolt enabled on WIN-4UE3RR5I302:7687.
+2022-12-26 09:47:29.233+0000 INFO  Remote interface available at http://localhost:7474/
+2022-12-26 09:47:29.233+0000 INFO  id: 18DDD2115561A46E3787B88DCDF52CAAF1D7F0C1E4DD7BC4CD0C270CA000195C
+2022-12-26 09:47:29.233+0000 INFO  name: system
+2022-12-26 09:47:29.233+0000 INFO  creationDate: 2022-12-26T08:23:02.929Z
+2022-12-26 09:47:29.233+0000 INFO  Started.

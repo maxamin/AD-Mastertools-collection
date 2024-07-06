@@ -1,0 +1,20 @@
+{
+	"version": "1.5.0-alpha+{height}",
+	"nugetPackageVersion": {
+		"semVer": 1
+	},
+	"semVer1NumericIdentifierPadding": 4,
+	"publicReleaseRefSpec": [
+		"^refs/tags/v\\d+\\.\\d+"
+	],
+	"cloudBuild": {
+		"setVersionVariables": true,
+		"buildNumber": {
+			"enabled": false,
+			"includeCommitId": {
+				"when": "nonPublicReleaseOnly",
+				"where": "buildMetadata"
+			}
+		}
+	}
+}

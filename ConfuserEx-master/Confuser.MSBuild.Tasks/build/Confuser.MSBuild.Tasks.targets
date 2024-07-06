@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<Project>
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <ConfuserAssemblyPath Condition="'$(MSBuildRuntimeType)' == 'Full'">$(MSBuildThisFileDirectory)\..\netframework\</ConfuserAssemblyPath>
+    <ConfuserAssemblyPath Condition="'$(ConfuserAssemblyPath)' == ''">$(MSBuildThisFileDirectory)\..\netstandard\</ConfuserAssemblyPath>
+  </PropertyGroup>
+
+  <UsingTask TaskName="Confuser.MSBuild.Tasks.CreateProjectTask"
+             AssemblyFile="$(ConfuserAssemblyPath)Confuser.MSBuild.Tasks.dll" />
+  <UsingTask TaskName="Confuser.MSBuild.Tasks.ConfuseTask"
+             AssemblyFile="$(ConfuserAssemblyPath)Confuser.MSBuild.Tasks.dll" />  
+</Project>

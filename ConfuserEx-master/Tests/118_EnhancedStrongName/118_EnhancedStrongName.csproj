@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net461</TargetFramework>
+    <RootNamespace>EnhancedStrongName</RootNamespace>
+    <SignAssembly>true</SignAssembly>
+    <DelaySign>true</DelaySign>
+    <AssemblyOriginatorKeyFile>IdentityPubKey.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="&quot;$(SDK40ToolsPath)sn.exe&quot; -Ra &quot;$(TargetPath)&quot; &quot;$(ProjectDir)SignatureKey.snk&quot;" />
+  </Target>
+
+</Project>
