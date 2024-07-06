@@ -21,8 +21,3 @@ This repository is intended solely for educational purposes and ethical penetrat
 - **ConfuserEx**: An open-source .NET obfuscator.
 - **DAMP**: SQL Server database assessment and monitoring tool.
 - **Deploy-Deception**: Tools and scripts for deploying deception environments.
-
-You can then upload this file to your GitHub repository. ​
-
-​
-Yo
